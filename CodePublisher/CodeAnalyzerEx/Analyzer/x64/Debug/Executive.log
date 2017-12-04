@@ -1,0 +1,16 @@
+﻿  Executive.cpp
+  Utilities.cpp
+  Tokenizer.cpp
+  SemiExp.cpp
+  ScopeStack.cpp
+  Parser.cpp
+  ConfigureParser.cpp
+  ActionsAndRules.cpp
+  Logger.cpp
+  GrammarHelpers.cpp
+  FileSystem.cpp
+  FileMgr.cpp
+  AbstrSynTree.cpp
+  Generating Code...
+  Executive.vcxproj -> K:\OOD\SubmittedProjects\Project3\CodeAnalyzerEx\x64\Debug\CodeAnalyzer.exe
+  Executive.vcxproj -> K:\OOD\SubmittedProjects\Project3\CodeAnalyzerEx\x64\Debug\CodeAnalyzer.pdb (Full PDB)

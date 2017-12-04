@@ -1,0 +1,133 @@
+<!----------------------------------------------------------------------------
+   CppProperties.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:40:42
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>CppProperties.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="CppProperties.h.htm">CppProperties.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+///////////////////////////////////////////////////////////////////// 
+// CppProperties.cpp - Defines read/write and read only properties // 
+//                                                                 // 
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2017       // 
+///////////////////////////////////////////////////////////////////// 
+#ifdef TEST_CPPPROPERTIES 
+#include "CppProperties.h" 
+#include &lt;string&gt; 
+#include &lt;iostream&gt; 
+class X 
+{<button onclick="myFunction(this)" id="button398">-</button><pre class="showElem" id="button398_pre"> 
+public: 
+  Property&lt;std::string&gt; name; 
+  Property&lt;double&gt; isMutable; 
+  Property&lt;const double&gt; pi = 3.1415927; 
+  Property&lt;const std::string&gt; constName = "a const name"; 
+</pre>}; 
+///////////////////////////////////////////////////////////////////// 
+// Z class: 
+// - demonstrates how to customize getter and setter functions 
+//   without changing public interface of Z. 
+// - That is important because it means that should we decide, 
+//   after a class was published, that we should control the 
+//   way the property behaves, we won't break existing clients. 
+/*----&lt; demo function for custom getter and setter &gt;---------------*/ 
+std::string toUpper(const std::string& str) 
+{<button onclick="myFunction(this)" id="button399">-</button><pre class="showElem" id="button399_pre"> 
+  std::string upperS = str; 
+  for (auto& c : upperS) 
+    c = toupper(c); 
+  return upperS; 
+</pre>} 
+class Z 
+{<button onclick="myFunction(this)" id="button400">-</button><pre class="showElem" id="button400_pre"> 
+public: 
+  Z() 
+  {<button onclick="myFunction(this)" id="button401">-</button><pre class="showElem" id="button401_pre"> 
+    // return value of setter is assigned to Property value 
+    name.setter( 
+      [](const std::string& s) { return toUpper(s); }  // set all chars to upper case 
+    ); 
+    // this also works: 
+    // name.setter(toUpper); 
+    // return value of getter is returned from cast to Property type 
+    name.getter(<button onclick="myFunction(this)" id="button402">-</button><pre class="showElem" id="button402_pre"> 
+      [=]() {  
+        std::string s = name.getValue();  
+        s[0] = tolower(s[0]);               // set first char to lower case 
+        return s;  
+</pre>      } 
+    ); 
+</pre>  } 
+  Property&lt;std::string&gt; name; 
+</pre>}; 
+///////////////////////////////////////////////////////////////////// 
+// - We can also modify the behavior of the propert by overriding 
+//   the property virtual functions.  That, however, modifies user 
+//   interface. 
+// 
+class UpperCaseProperty : public Property&lt;std::string&gt; 
+{<button onclick="myFunction(this)" id="button403">-</button><pre class="showElem" id="button403_pre"> 
+public: 
+  UpperCaseProperty(const std::string& s) <button onclick="myFunction(this)" id="button404">-</button><pre class="showElem" id="button404_pre"> 
+  {  
+    value = toUpper(s);  
+</pre>  } 
+  virtual Property&lt;std::string&gt;& operator=(const std::string &s) 
+  {<button onclick="myFunction(this)" id="button405">-</button><pre class="showElem" id="button405_pre"> 
+    value = toUpper(s); 
+    return *this; 
+</pre>  } 
+</pre>}; 
+class Y 
+{<button onclick="myFunction(this)" id="button406">-</button><pre class="showElem" id="button406_pre"> 
+public: 
+  UpperCaseProperty name = "jim"; 
+</pre>}; 
+int main() 
+{<button onclick="myFunction(this)" id="button407">-</button><pre class="showElem" id="button407_pre"> 
+  std::cout &lt;&lt; "\n  Demonstrate C++ Properties class"; 
+  std::cout &lt;&lt; "\n =================================="; 
+  X x; 
+  x.name = "Jim"; 
+  std::cout &lt;&lt; "\n  x.name = " &lt;&lt; x.name; 
+  std::cout &lt;&lt; "\n  x.pi = " &lt;&lt; x.pi; 
+  std::cout &lt;&lt; "\n  x.isMutable = " &lt;&lt; x.isMutable; 
+  x.isMutable = x.pi; 
+  std::cout &lt;&lt; "\n  x.isMutable = " &lt;&lt; x.isMutable; 
+  std::cout &lt;&lt; "\n  x.constName = " &lt;&lt; x.constName; 
+  std::cout &lt;&lt; "\n  making a copy of x, called newX:"; 
+  std::cout &lt;&lt; "\n ----------------------------------"; 
+  X newX(x); 
+  newX.name = "joe"; 
+  std::cout &lt;&lt; "\n  newX.name = " &lt;&lt; newX.name; 
+  //x.constName = "a new name";  // fails to compile - that's good 
+  std::cout &lt;&lt; "\n"; 
+  std::cout &lt;&lt; "\n  demonstrate overriding property \"getter\" function"; 
+  std::cout &lt;&lt; "\n ---------------------------------------------------"; 
+  Y y; 
+  std::cout &lt;&lt; "\n  y.name = " &lt;&lt; y.name; 
+  std::cout &lt;&lt; "\n"; 
+  std::cout &lt;&lt; "\n  demonstrate providing custom getter and setter functions"; 
+  std::cout &lt;&lt; "\n ----------------------------------------------------------"; 
+  Z z; 
+  z.name = "fawcett"; 
+  std::cout &lt;&lt; "\n  z.name = " &lt;&lt; z.name; 
+  std::cout &lt;&lt; "\n\n"; 
+</pre>} 
+#endif 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

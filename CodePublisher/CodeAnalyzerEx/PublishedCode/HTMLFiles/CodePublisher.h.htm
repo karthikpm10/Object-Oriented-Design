@@ -1,0 +1,105 @@
+<!----------------------------------------------------------------------------
+   CodePublisher.h.htm  -Published HTML File
+   Published on : 2017-04-04.21:40:35
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>CodePublisher.h</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="CodePublisher.cpp.htm">CodePublisher.cpp</a></li>
+<li><a href="DependencyAnalysis.h.htm">DependencyAnalysis.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#pragma once 
+/////////////////////////////////////////////////////////////////////////////////////// 
+// DependencyAnalysis.h - Pubishes HTML files for the code                             // 
+//                                                                                    // 
+// Karthik Palepally Muniyappa,CSE687 - Object Oriented Design, Spring 2017          //  
+//                                                                                  // 
+//////////////////////////////////////////////////////////////////////////////////// 
+/* 
+Module Operations: 
+================== 
+This module defines an CodePublisher Class 
+CodePublisher class defines functions to: 
+publish the html files for the input files specified and generate a HTML Menu page with all the published files 
+ 
+Public Interface: 
+================= 
+CodePublisher(DependencyTable &objDepTable, std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; buttonMap); 
+void publishFiles(std::vector&lt;std::string&gt; fileNames); 
+* Required Files: 
+* --------------- 
+*   - DependencyAnalysis.h 
+*    
+* Build Process: 
+* -------------- 
+*   devenv CodePublisher.sln /debug rebuild 
+* 
+* Maintenance History: 
+* -------------------- 
+ver 0.1 : 4th April 2017 
+* 
+/* 
+* - 
+*/ 
+#include &lt;iostream&gt; 
+#include&lt;fstream&gt; 
+#include&lt;string&gt; 
+#include&lt;vector&gt; 
+#include&lt;stack&gt; 
+#include&lt;algorithm&gt; 
+#include &lt;sstream&gt; 
+#include&lt;Windows.h&gt; 
+#include "../DependencyAnalyzer/DependencyAnalysis.h" 
+ 
+namespace CodeAnalysis 
+{ 
+	class CodePublisher 
+	{<button onclick="myFunction(this)" id="button9">-</button><pre class="showElem" id="button9_pre"> 
+	public: 
+		CodePublisher(DependencyTable &objDepTable, std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; buttonMap); 
+		void publishFiles(std::vector&lt;std::string&gt; fileNames); 
+		 
+ 
+ 
+	private: 
+		std::unordered_map&lt;std::string, std::string&gt; htmlFilesMap; 
+		std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; buttonTableMap; 
+		DependencyTable &depTable; 
+		std::string htmlFpath = "../../PublishedCode/HTMLFiles/"; 
+		std::string cssFpath = "../CSS/style.css"; 
+		std::string jsFpath = "../JS/hideHandler.js"; 
+		std::vector&lt;std::string&gt; FilesToPublish; 
+		int id = 1; 
+		void createHTMLFile(std::string ipfilePath); 
+		bool checkifButtonclosed(std::unordered_map&lt;std::size_t, std::size_t&gt; map, size_t lineNumber); 
+		std::stack&lt;std::string&gt; split(const std::string s, char delim); 
+		bool writeTofile(std::string content, std::string fName); 
+		std::string processLine(std::string line); 
+		std::string generateButtonTag(std::string id); 
+		std::string generatePreTag(std::string id); 
+		std::string generateHTMLOpenningTags(std::string cssFname, std::string filename); 
+		std::string generateDependencyTags(std::string filename); 
+		void generateHtmlMenuPage(std::string opfilename); 
+		void openHtmlPages(std::string fpath); 
+		std::string getPrologue(std::string filename); 
+		void addFilesToPublish(std::vector&lt;std::string&gt; files); 
+		bool isHtmlFilePublished(std::string fname); 
+	 
+ 
+</pre>	}; 
+} 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

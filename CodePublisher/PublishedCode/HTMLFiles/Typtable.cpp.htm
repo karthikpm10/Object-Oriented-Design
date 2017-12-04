@@ -1,0 +1,241 @@
+<!----------------------------------------------------------------------------
+   Typtable.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:57
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>Typtable.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="Typtable.h.htm">Typtable.h</a></li>
+<li><a href="ActionsAndRules.h.htm">ActionsAndRules.h</a></li>
+<li><a href="AbstrSynTree.h.htm">AbstrSynTree.h</a></li>
+<li><a href="FileSystem.h.htm">FileSystem.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#include"Typtable.h" 
+using namespace CodeAnalysis; 
+//constructor 
+TypeTable::TypeTable() : 
+	ASTref_(Repository::getInstance()-&gt;AST()) {<button onclick="myFunction(this)" id="button682">-</button><pre class="showElem" id="button682_pre"> 
+	 
+</pre>} 
+ 
+//checks the type of the node 
+bool TypeTable::checkType(ASTNode* pNode) 
+{<button onclick="myFunction(this)" id="button683">-</button><pre class="showElem" id="button683_pre"> 
+	static std::string toDisplay[] = { 
+		"class", "struct", "enum" 
+	}; 
+	for (std::string type : toDisplay) 
+	{ 
+		if (pNode-&gt;type_ == type) 
+			return true; 
+	} 
+	return false; 
+</pre>} 
+ 
+// stores the global function into a map 
+void TypeTable::storeGlobalFunction(ASTNode* pNode) 
+{<button onclick="myFunction(this)" id="button684">-</button><pre class="showElem" id="button684_pre"> 
+	std::vector&lt;std::string&gt; filenames; 
+	if (globalFuncMap.find(pNode-&gt;name_) == globalFuncMap.end()) 
+	{ 
+		filenames.push_back(pNode-&gt;path_); 
+	} 
+	else 
+	{ 
+		filenames = globalFuncMap[pNode-&gt;name_]; 
+		filenames.push_back(pNode-&gt;path_); 
+	} 
+	globalFuncMap[pNode-&gt;name_] = filenames; 
+</pre>} 
+//performs dfs and stores type info 
+void TypeTable::typeAnalysis(ASTNode* pNode) 
+{<button onclick="myFunction(this)" id="button685">-</button><pre class="showElem" id="button685_pre"> 
+	insertIntoButtonMap(pNode); 
+	static std::string path = ""; 
+	if (pNode-&gt;path_ != path) 
+	{ 
+		//std::cout &lt;&lt; "\n    -- " &lt;&lt; pNode-&gt;path_ &lt;&lt; "\\" &lt;&lt; pNode-&gt;package_; 
+		path = pNode-&gt;path_; 
+	} 
+	if (pNode-&gt;type_ == "namespace") 
+	{ 
+		nameSpaceStack.push(pNode-&gt;name_); 
+	} 
+ 
+	if (checkType(pNode)) 
+	{ 
+		TypeInfo mapelem; 
+		mapelem.setType(pNode-&gt;type_); 
+		mapelem.setFile(pNode-&gt;path_); 
+		mapelem.setNamespace(nameSpaceStack.top()); 
+		std::vector&lt;TypeInfo&gt; vectorMap; 
+		if (typeTableMap.find(pNode-&gt;name_) == typeTableMap.end()) 
+		{ 
+			vectorMap.push_back(mapelem); 
+		} 
+		else 
+		{ 
+			vectorMap = typeTableMap[pNode-&gt;name_]; 
+			vectorMap.push_back(mapelem); 
+		} 
+		typeTableMap[pNode-&gt;name_] = vectorMap; 
+	} 
+	for (auto pChild : pNode-&gt;children_) 
+	{ 
+		typeAnalysis(pChild); 
+	} 
+	if (pNode-&gt;type_ == "namespace") { 
+		nameSpaceStack.pop(); 
+	} 
+</pre>} 
+//initates type analysis 
+void TypeTable::doTypeAnal() 
+{<button onclick="myFunction(this)" id="button686">-</button><pre class="showElem" id="button686_pre"> 
+	ASTNode* pRoot = ASTref_.root(); 
+	typeAnalysis(pRoot); 
+	extractGlobalFunctions(Repository::getInstance()-&gt;getGlobalScope()); 
+</pre>} 
+ 
+void TypeTable::extractGlobalFunctions(ASTNode * globalNode) {<button onclick="myFunction(this)" id="button687">-</button><pre class="showElem" id="button687_pre"> 
+	for (auto node : globalNode-&gt;children_) { 
+		if (node-&gt;type_ == "function") { 
+			if ((node-&gt;name_ != "main") && (node-&gt;name_ != "void")) 
+				storeGlobalFunction(node); 
+			//std::cout&lt;&lt; "found global function: " &lt;&lt; node-&gt;name_&lt;&lt;"\n"; 
+			// do stuff to the found global function 
+		} 
+	} 
+</pre>} 
+// displays the type table 
+void TypeTable::showTypeTable() 
+{<button onclick="myFunction(this)" id="button688">-</button><pre class="showElem" id="button688_pre"> 
+	std::cout &lt;&lt; "\n\n\n************************************TypeTable*****************************************\n"; 
+	std::cout &lt;&lt; std::setw(20) &lt;&lt; "TypeName" &lt;&lt; std::setw(15) &lt;&lt; "Type" &lt;&lt; std::setw(25) &lt;&lt; "Namespace" &lt;&lt; "Filename"; 
+	std::cout &lt;&lt; "\n--------------------------------------------------------------------------------------------------------------\n"; 
+	for (auto item = typeTableMap.begin(); item != typeTableMap.end(); ++item) 
+	{ 
+		std::string typeName = item-&gt;first; 
+		std::vector&lt;TypeInfo&gt; filesVector = item-&gt;second; 
+ 
+ 
+		for (size_t it = 0; it &lt; filesVector.size(); it++) { 
+			TypeInfo map = filesVector[it]; 
+			std::cout &lt;&lt; std::setw(20) &lt;&lt; typeName &lt;&lt; std::setw(15) &lt;&lt; map.getType() &lt;&lt; std::setw(25) &lt;&lt; map.getNamespace() &lt;&lt; map.getFile(); 
+			std::cout &lt;&lt; "\n"; 
+		} 
+	} 
+	std::cout &lt;&lt; "\n\n"; 
+	std::cout &lt;&lt; "\n\n\n************************************GlobalFunctionTable*****************************************\n"; 
+	std::cout &lt;&lt; std::setw(20) &lt;&lt; "TypeName" &lt;&lt; std::setw(17) &lt;&lt; "Type" &lt;&lt; std::setw(25) &lt;&lt; "Namespace" &lt;&lt; "Filename"; 
+	std::cout &lt;&lt; "\n--------------------------------------------------------------------------------------------------------------\n"; 
+	for (auto globalFunc : globalFuncMap) 
+	{ 
+		std::cout &lt;&lt; std::setw(20) &lt;&lt; globalFunc.first &lt;&lt; std::setw(17) &lt;&lt; "GlobalFunction" &lt;&lt; std::setw(25) &lt;&lt; "GlobalNamespace"; 
+		for (std::string fname : globalFunc.second) 
+		{ 
+			std::cout &lt;&lt; fname &lt;&lt; "  "; 
+		} 
+		std::cout &lt;&lt; "\n"; 
+	} 
+	std::cout &lt;&lt; "\n\n"; 
+</pre>} 
+ 
+//returns the filenames where the token is defined 
+std::vector&lt;std::string&gt; TypeTable::getTypeDefinationFnames(std::string typeName) 
+{<button onclick="myFunction(this)" id="button689">-</button><pre class="showElem" id="button689_pre"> 
+	if (typeTableMap.find(typeName) != typeTableMap.end()) 
+	{ 
+		std::vector&lt;std::string&gt; files; 
+		std::vector&lt;TypeInfo&gt; filesVector = typeTableMap[typeName]; 
+		//std::vector&lt;stringMap&gt;::iterator it; 
+ 
+		for (size_t it = 0; it &lt; filesVector.size(); it++) { 
+			TypeInfo map = filesVector[it]; 
+			files.push_back(map.getFile()); 
+		} 
+		return files; 
+	} 
+	else if (globalFuncMap.find(typeName) != globalFuncMap.end()) 
+	{ 
+		return globalFuncMap[typeName]; 
+	} 
+	return std::vector&lt;std::string&gt;(); 
+</pre>} 
+//returns a map which stores the start line and end line for classes,global functions and methods for all the files 
+std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; CodeAnalysis::TypeTable::getButtonMap() 
+{<button onclick="myFunction(this)" id="button690">-</button><pre class="showElem" id="button690_pre"> 
+	return buttonTableMap; 
+</pre>} 
+//checks if a node is a global function 
+void TypeTable::chekIfGlobalFun(ASTNode * pNode) 
+{<button onclick="myFunction(this)" id="button691">-</button><pre class="showElem" id="button691_pre"> 
+	//if (((checkType(pNode)) && (pNode-&gt;children_.size() &gt; 0))) 
+	if ((!doNotInclFun) && checkType(pNode)) 
+	{ 
+		doNotInclFun = true; 
+		parentSetter = pNode-&gt;name_; 
+	} 
+</pre>} 
+//checks if a node is a global function with children 
+void TypeTable::chekIfGlobalFunWithChild(ASTNode * pNode) 
+{<button onclick="myFunction(this)" id="button692">-</button><pre class="showElem" id="button692_pre"> 
+	if ((!doNotInclFun) && ((pNode-&gt;type_ == "function") && ((pNode-&gt;children_.size() &gt; 0)))) 
+	{ 
+		doNotInclFun = true; 
+		globFunWchild = true; 
+		parentSetter = pNode-&gt;name_; 
+	} 
+</pre>} 
+//populats a map with  the start line and end line for classes,global functions and methods for  the file which pNode represents 
+void CodeAnalysis::TypeTable::insertIntoButtonMap(ASTNode * pNode) 
+{<button onclick="myFunction(this)" id="button693">-</button><pre class="showElem" id="button693_pre"> 
+	if (pNode-&gt;startLineCount_ != pNode-&gt;endLineCount_) 
+	{ 
+		static std::string toDisplay[] = { 
+			"class", "function" 
+		}; 
+		for (std::string type : toDisplay) 
+		{ 
+			if (pNode-&gt;type_ == type) 
+			{ 
+				std::unordered_map&lt;std::size_t, std::size_t&gt; map; 
+				if (buttonTableMap.find(pNode-&gt;path_) != buttonTableMap.end()) 
+				{ 
+					map = buttonTableMap[pNode-&gt;path_]; 
+					map[pNode-&gt;startLineCount_] = pNode-&gt;endLineCount_; 
+				} 
+				else 
+				{ 
+					map[pNode-&gt;startLineCount_] = pNode-&gt;endLineCount_; 
+				} 
+				buttonTableMap[pNode-&gt;path_] = map; 
+			} 
+		} 
+	} 
+</pre>} 
+#ifdef DEBUGTypTable 
+int main() 
+{<button onclick="myFunction(this)" id="button694">-</button><pre class="showElem" id="button694_pre"> 
+	TypeTable obj; 
+	obj.doTypeAnal(); 
+	obj.showTypeTable(); 
+	obj.getTypeDefinationFnames("NosqlDB"); 
+	obj.getButtonMap(); 
+	return 0; 
+</pre>} 
+#endif 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

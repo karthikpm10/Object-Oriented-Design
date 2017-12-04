@@ -1,0 +1,334 @@
+<!----------------------------------------------------------------------------
+   CodePublisher.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:51
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>CodePublisher.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="CodePublisher.h.htm">CodePublisher.h</a></li>
+<li><a href="DependencyAnalysis.h.htm">DependencyAnalysis.h</a></li>
+<li><a href="FileSystem.h.htm">FileSystem.h</a></li>
+<li><a href="NoSqlDb.h.htm">NoSqlDb.h</a></li>
+<li><a href="DBWrapper.h.htm">DBWrapper.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#include "CodePublisher.h" 
+using namespace CodeAnalysis; 
+//constructor which accepts a reference to a DependencyTable object and a map which stores the start line and end line for global functions,methods and classes 
+CodeAnalysis::CodePublisher::CodePublisher(DependencyTable & objDepTable, std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; buttonMap):depTable(objDepTable), buttonTableMap(buttonMap) 
+{ 
+} 
+ 
+//publishes html files for all the files in the filenames vector 
+void CodePublisher::publishFiles(std::vector&lt;std::string&gt; fileNames) 
+{<button onclick="myFunction(this)" id="button379">-</button><pre class="showElem" id="button379_pre"> 
+	std::cout &lt;&lt; "*************   HTML files are stored in: "&lt;&lt; FileSystem::Path::getFullFileSpec(htmlFpath) &lt;&lt;"    ************\n"; 
+	std::cout &lt;&lt; "*************REQUIREMENT 4 : facility to expand or collapse class bodies, methods, and global functions using JavaScript and CSS properties provided, HTML files can be checked************\n"; 
+	std::cout &lt;&lt; "*************REQUIREMENT 5 : CSS style sheet present in : "&lt;&lt; FileSystem::Path::getFullFileSpec("../../PublishedCode/CSS/style.css") &lt;&lt;"  Provided in the html files,HTML files can be checked************\n"; 
+	std::cout &lt;&lt; "*************REQUIREMENT 5 : Javascript file present in : " &lt;&lt; FileSystem::Path::getFullFileSpec("../../PublishedCode/JS/hideHandler.js") &lt;&lt; "  Provided in the html files,HTML files can be checked************\n"; 
+	std::cout &lt;&lt; "*************REQUIREMENT 6 : Links to Javascript files and CSS style sheet  Provided in the html files,HTML files can be checked************\n"; 
+	std::cout &lt;&lt; "*************REQUIREMENT 7 : HTML5 links to dependent files with a label is embedded in the html files,HTML files can be checked************\n"; 
+	//../../PublishedCode 
+	addFilesToPublish(fileNames); 
+	std::string fileSpec = ""; 
+	try 
+	{ 
+		std::vector&lt;std::string&gt;::iterator fileSpec; 
+		//iterating over all the files 
+		std::cout &lt;&lt; "*************REQUIREMENT 3 : Publisher program that provides for creation of web pages each of which captures the content of a single C++ source code file is called on line 26 of CodePublisher.cpp************\n"; 
+		std::cout &lt;&lt; "\n*************************************Publishing HTML FIles******************************************\n"; 
+		std::cout &lt;&lt; "\n*************************************Processing******************************************\n"; 
+		for (fileSpec = fileNames.begin(); fileSpec &lt; fileNames.end(); fileSpec++) { 
+			//creating html files for the file specified by *fileSpec 
+			createHTMLFile(*fileSpec); 
+		} 
+		// generating the HTML menu page with all the filenames that are published 
+		generateHtmlMenuPage(FileSystem::Path::getFullFileSpec(htmlFpath + "menu.htm")); 
+	} 
+	catch (std::logic_error& ex) 
+	{ 
+		std::cout &lt;&lt; ex.what(); 
+	} 
+</pre>} 
+ 
+//creates HTML file for the file specified by ipfilePath by creating the HTML tags necessary,adding comments,adding contents of the code  
+//within the pre tag 
+//adding buttons for hiding and unhiding of class,method and global function bodies 
+void CodePublisher::createHTMLFile(std::string ipfilePath) 
+{<button onclick="myFunction(this)" id="button380">-</button><pre class="showElem" id="button380_pre"> 
+	std::string line; 
+	size_t lineCount = 1; 
+	std::string fileName = split(ipfilePath, '\\').top(); 
+	std::string opfilename = htmlFpath + fileName + ".htm"; 
+	std::ifstream ipfile(ipfilePath); 
+	std::ofstream opHtmlfile(opfilename); 
+	if (ipfile.is_open() && opHtmlfile.is_open()) 
+	{ 
+		//map of start line count and end line count for the global functions ,methods anad classes in the file specified by ipfilePath 
+		std::unordered_map&lt;std::size_t, std::size_t&gt; butMap= buttonTableMap[ipfilePath]; 
+		opHtmlfile &lt;&lt; getPrologue(split(FileSystem::Path::getFullFileSpec(opfilename), '\\').top()); 
+		opHtmlfile &lt;&lt; generateHTMLOpenningTags(cssFpath, fileName) + generateDependencyTags(ipfilePath) + "&lt;pre&gt;\n"; 
+		while (getline(ipfile, line)) 
+		{ 
+			if (checkifButtonclosed(butMap, lineCount)) 
+			{ 
+				opHtmlfile &lt;&lt; "&lt;/pre&gt;" + processLine(line) + " " + "\n"; 
+				butMap.erase(lineCount); 
+			} 
+			if (butMap.find(lineCount) != butMap.end()) 
+			{ 
+				id++; 
+				if((butMap[lineCount]!=lineCount+1)) 
+				opHtmlfile &lt;&lt; processLine(line) + generateButtonTag(std::to_string(id)) + generatePreTag(std::to_string(id))+ " " + "\n"; 
+				else 
+				{ 
+					opHtmlfile &lt;&lt; processLine(line) + " " + "\n"; 
+					butMap.erase(lineCount);	 
+				} 
+			} 
+			else 
+			{ 
+				if(!checkifButtonclosed(butMap, lineCount)) 
+				opHtmlfile &lt;&lt; processLine(line) + " " + "\n"; 
+			} 
+			lineCount++; 
+		} 
+		opHtmlfile&lt;&lt; "&lt;/pre&gt;\n&lt;script src=\"" + jsFpath + "\"&gt;&lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;"; 
+		ipfile.close(); 
+		opHtmlfile.close(); 
+		htmlFilesMap[split(FileSystem::Path::getFullFileSpec(opfilename), '\\').top()] = opfilename; 
+	} 
+	else 
+		std::cout &lt;&lt; "Unable to open file"; 
+</pre>} 
+//checks if in the lineNumber a class or a global function or a method closes 
+bool CodeAnalysis::CodePublisher::checkifButtonclosed(std::unordered_map&lt;std::size_t, std::size_t&gt; map, size_t lineNumber) 
+{<button onclick="myFunction(this)" id="button381">-</button><pre class="showElem" id="button381_pre"> 
+	for (auto item : map) 
+	{ 
+		if (item.second == lineNumber) 
+			return true; 
+	} 
+	return false; 
+</pre>} 
+ 
+//splits the string s on the occurence of delim character and returns a stack with the split strings 
+std::stack&lt;std::string&gt; CodePublisher::split(const std::string s, char delim) {<button onclick="myFunction(this)" id="button382">-</button><pre class="showElem" id="button382_pre"> 
+	std::stack&lt;std::string&gt; elems; 
+	std::stringstream ss(s); 
+	std::string item; 
+	while (std::getline(ss, item, delim)) { 
+		if (item.length() &gt; 0) { 
+			elems.push(item); 
+		} 
+	} 
+	return elems; 
+</pre>} 
+ 
+// writes the content to the file fName 
+bool CodeAnalysis::CodePublisher::writeTofile(std::string content, std::string fName) 
+{<button onclick="myFunction(this)" id="button383">-</button><pre class="showElem" id="button383_pre"> 
+	try 
+	{ 
+		std::ofstream fstream(fName); 
+		if (fstream.is_open()) 
+		{ 
+			fstream &lt;&lt; content; 
+			fstream.close(); 
+		} 
+		else 
+		{ 
+			std::cout &lt;&lt; "Unable to open file"; 
+			return false; 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+		return false; 
+	} 
+	return true; 
+</pre>} 
+//replaces oocurences of &lt; and &gt; with &lt; and &gt; in the line and returns the new string 
+std::string CodePublisher::processLine(std::string line) 
+{<button onclick="myFunction(this)" id="button384">-</button><pre class="showElem" id="button384_pre"> 
+	std::string processedLine; 
+	for (char& c : line) { 
+		std::string newstr; 
+		if (c == '&lt;') 
+		{ 
+			newstr = "&lt;"; 
+ 
+		} 
+		else if (c == '&gt;') 
+		{ 
+			newstr = "&gt;"; 
+		} 
+		else if (c == '{') 
+		{ 
+			newstr = c; 
+		} 
+		else if(c=='}') 
+		{ 
+			newstr = "}"; 
+		} 
+		else 
+		{ 
+			newstr = c; 
+		} 
+		processedLine = processedLine + newstr; 
+	} 
+	return processedLine; 
+</pre>} 
+ 
+// generates a string of the html tags necessary for adding a button in an html file with the given id. and returns this string 
+std::string CodePublisher::generateButtonTag(std::string id) 
+{<button onclick="myFunction(this)" id="button385">-</button><pre class="showElem" id="button385_pre"> 
+	std::string buttonTag = "&lt;button onclick=\"myFunction(this)\" id=\"button" + id + "\"&gt;-&lt;/button&gt;"; 
+	return buttonTag; 
+</pre>} 
+//generates a string of the html tags necessary for adding a pre tag in an html file with the given id and returns this string 
+std::string CodePublisher::generatePreTag(std::string id) 
+{<button onclick="myFunction(this)" id="button386">-</button><pre class="showElem" id="button386_pre"> 
+	std::string preTag="&lt;pre class=\"showElem\" id=\"button"+id+"_pre\"&gt;"; 
+		return preTag; 
+</pre>} 
+// generates a string of the html tags necessary for the starting of an html file  
+//and sets the reference of the css file, and adds the filename in the header 
+std::string CodePublisher::generateHTMLOpenningTags(std::string cssFname, std::string filename) 
+{<button onclick="myFunction(this)" id="button387">-</button><pre class="showElem" id="button387_pre"> 
+	std::string openingTags = "&lt;html&gt;\n&lt;head&gt;\n&lt;link rel=\"stylesheet\" href=\""+cssFname+"\"&gt;\n&lt;/head&gt;\n&lt;body&gt;\n&lt;h3&gt;"+filename+"&lt;/h3&gt;\n"; 
+	return openingTags; 
+</pre>} 
+//generates href tags necessaary for an HTML file, it finds all the files that the given filename depends on from the dependency table 
+//and adds the refernces to these files in the html page, returns this string representation of href tags 
+std::string CodeAnalysis::CodePublisher::generateDependencyTags(std::string filename) 
+{<button onclick="myFunction(this)" id="button388">-</button><pre class="showElem" id="button388_pre"> 
+	std::string depTags = "&lt;hr /&gt;\n&lt;div class=\"indent\"&gt;\n&lt;h4&gt;Dependencies:&lt;/h4&gt;\n"; 
+	Element&lt;std::string&gt; record = depTable.getRecord(filename); 
+	std::stack&lt;std::string&gt; fn = split(split(filename, '\\').top(),'.'); 
+	std::vector&lt;std::string&gt; children = record.children; 
+	depTags = depTags + "&lt;ul&gt;\n"; 
+	if (fn.top() == "h") 
+	{ 
+		fn.pop(); 
+		if(isHtmlFilePublished(fn.top() + ".cpp" + ".htm")) 
+		depTags = depTags + "&lt;li&gt;&lt;a href=\"" + fn.top() + ".cpp" + ".htm\"&gt;" + fn.top() + ".cpp" + "&lt;/a&gt;&lt;/li&gt;\n"; 
+	} 
+	for (string child : children) { 
+		if (!(filename == child)) 
+		{ 
+			std::stack&lt;std::string&gt; depfileNamesSplit = split(child, '\\'); 
+			std::string depfileName = depfileNamesSplit.top(); 
+			depTags = depTags + "&lt;li&gt;&lt;a href=\""+depfileName+".htm\"&gt;"+ depfileName +"&lt;/a&gt;&lt;/li&gt;\n"; 
+		} 
+	} 
+	depTags = depTags + "&lt;/ul&gt;\n"; 
+	depTags = depTags + "&lt;/div&gt;\n&lt;hr /&gt;\n"; 
+	return depTags; 
+</pre>} 
+ 
+//creates a html menu page with refernces to all the html files which are published 
+void CodeAnalysis::CodePublisher::generateHtmlMenuPage(std::string opfilename) 
+{<button onclick="myFunction(this)" id="button389">-</button><pre class="showElem" id="button389_pre"> 
+	std::ofstream opHtmlfile(opfilename); 
+	std::string fileName = split(opfilename, '\\').top(); 
+	if (opHtmlfile.is_open()) 
+	{ 
+		opHtmlfile &lt;&lt; getPrologue(fileName); 
+		opHtmlfile &lt;&lt; generateHTMLOpenningTags(cssFpath, fileName) + "&lt;hr /&gt;\n&lt;div class=\"indent\"&gt;\n&lt;h4&gt;PublishedFiles:&lt;/h4&gt;\n&lt;hr /&gt;\n"; 
+		opHtmlfile &lt;&lt; "&lt;ul&gt;\n"; 
+		for (auto file : htmlFilesMap) 
+		{ 
+			opHtmlfile &lt;&lt; "&lt;li&gt;&lt;a href=\"" + file.first + "\"&gt;" + file.first + "&lt;/a&gt;&lt;/li&gt;\n"; 
+		} 
+		opHtmlfile &lt;&lt; "&lt;/ul&gt;\n"; 
+		opHtmlfile &lt;&lt; "&lt;hr /&gt;\n"; 
+		opHtmlfile &lt;&lt; "&lt;/div&gt;\n&lt;hr/&gt;\n"; 
+		opHtmlfile &lt;&lt; "\n&lt;/body&gt;\n&lt;/html&gt;"; 
+		opHtmlfile.close(); 
+		openHtmlPages(opfilename); 
+	} 
+	else 
+	{ 
+		std::cout &lt;&lt; "Unable to open file"; 
+	} 
+</pre>} 
+ 
+//opens the file specified by fpath in the browser 
+void CodeAnalysis::CodePublisher::openHtmlPages(std::string fpath) 
+{<button onclick="myFunction(this)" id="button390">-</button><pre class="showElem" id="button390_pre"> 
+	std::string path = "file:///" + FileSystem::Path::getFullFileSpec(fpath); 
+	std::wstring spath = std::wstring(path.begin(), path.end()); 
+	LPCWSTR swpath = spath.c_str(); 
+	ShellExecute(NULL, L"open", swpath, NULL, NULL, SW_SHOWNORMAL); 
+	//system("PAUSE"); 
+</pre>} 
+//generates a Prologue for a given filename 
+std::string CodeAnalysis::CodePublisher::getPrologue(std::string filename) 
+{<button onclick="myFunction(this)" id="button391">-</button><pre class="showElem" id="button391_pre"> 
+	time_t timeobj; 
+	time(&timeobj); 
+ 
+	struct tm  tstruct = {}; 
+	char buf[80]; 
+	localtime_s(&tstruct, &timeobj); 
+	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct); 
+	std::string datestr(buf); 
+	std::string comments = "&lt;!----------------------------------------------------------------------------\n"; 
+	comments = comments+"   " + filename+"  -Published HTML File\n"; 
+	comments = comments+"   " + "Published on : "+ datestr +"\n"; 
+	comments = comments + "   Author:Karthik Palepally Muniyappa  \n"; 
+	comments = comments + "-----------------------------------------------------------------------------&gt;\n"; 
+	return comments; 
+</pre>} 
+// adds the list of files whose html files have to be generated 
+void CodeAnalysis::CodePublisher::addFilesToPublish(std::vector&lt;std::string&gt; files) 
+{<button onclick="myFunction(this)" id="button392">-</button><pre class="showElem" id="button392_pre"> 
+	for (auto file : files) 
+	{ 
+		FilesToPublish.push_back(split(file, '\\').top()+".htm"); 
+	} 
+</pre>} 
+//checks if the html file specified by fname should be published 
+bool CodeAnalysis::CodePublisher::isHtmlFilePublished(std::string fname) 
+{<button onclick="myFunction(this)" id="button393">-</button><pre class="showElem" id="button393_pre"> 
+	for (auto file : FilesToPublish) 
+	{ 
+		if (file == fname) 
+			return true; 
+	} 
+	return false; 
+</pre>} 
+ 
+#ifdef DEBUGCODEPUBLISHER 
+int main(int argc, char* argv[]) 
+{<button onclick="myFunction(this)" id="button394">-</button><pre class="showElem" id="button394_pre"> 
+	std::cout &lt;&lt; "here"; 
+	CodePublisher obj; 
+	std::vector&lt;std::string&gt; fileNames; 
+	fileNames.push_back("../test3/typetable.h") 
+	fileNames.push_back("../test3/typetable.cpp") 
+	obj.publishFiles(std::vector&lt;std::string&gt; fileNames); 
+	getchar(); 
+ 
+</pre>} 
+#endif 
+ 
+ 
+ 
+ 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

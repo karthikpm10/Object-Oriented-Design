@@ -1,0 +1,7 @@
+﻿  XmlDocument.cpp
+  XmlParser.cpp
+  XmlElement.cpp
+  xmlElementParts.cpp
+  Tokenizer.cpp
+  Generating Code...
+  XmlDocument.vcxproj -> K:\OOD\SubmittedProjects\Project3\CodeAnalyzerEx\x64\Debug\XmlDocument.lib

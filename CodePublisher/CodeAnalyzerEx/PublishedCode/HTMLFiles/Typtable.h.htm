@@ -1,0 +1,171 @@
+<!----------------------------------------------------------------------------
+   Typtable.h.htm  -Published HTML File
+   Published on : 2017-04-04.21:40:39
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>Typtable.h</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="Typtable.cpp.htm">Typtable.cpp</a></li>
+<li><a href="FileSystem.h.htm">FileSystem.h</a></li>
+<li><a href="AbstrSynTree.h.htm">AbstrSynTree.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#pragma once 
+/////////////////////////////////////////////////////////////////////////////////////// 
+// TypeTable.h - stores file names, type names ,namesspace for each type defined     // 
+//                                                                                    // 
+// Karthik Palepally Muniyappa,CSE687 - Object Oriented Design, Spring 2017          //  
+//                                                                                  // 
+//////////////////////////////////////////////////////////////////////////////////// 
+/* 
+Module Operations: 
+================== 
+This module defines an TypeInfo Class which is a container class for type table and it also defines TypeTable class 
+ 
+TypeTable class defines functions to: 
+build dependency table based on type info stored in type table 
+return keys stored in the database 
+return row for a given key from the db 
+show the contents of the dependecy table 
+ 
+Public Interface: 
+================= 
+TypeTable();//constructor 
+bool checkType(ASTNode * pNode); 
+void storeGlobalFunction(ASTNode * pNode); 
+void typeAnalysis(ASTNode * pNode); 
+void doTypeAnal(); 
+ 
+void showTypeTable(); 
+std::vector&lt;std::string&gt; getTypeDefinationFnames(std::string typeName); 
+* Required Files: 
+* --------------- 
+*   - AbstrSynTree.h 
+*   - ActionsAndRules.h 
+*     
+* Build Process: 
+* -------------- 
+*   devenv TypeTable.sln /debug rebuild 
+* 
+* Maintenance History: 
+* -------------------- 
+ver 0.1 : 7nd March 2017 
+* 
+/* 
+* - 
+*/ 
+#include &lt;string&gt; 
+#include &lt;unordered_map&gt; 
+#include &lt;iostream&gt; 
+#include &lt;vector&gt; 
+#include&lt;stack&gt; 
+ 
+#include "../AbstractSyntaxTree/AbstrSynTree.h" 
+#include "../Parser/ActionsAndRules.h" 
+ 
+namespace CodeAnalysis 
+{  
+	// container class for type table 
+	class TypeInfo 
+	{<button onclick="myFunction(this)" id="button247">-</button><pre class="showElem" id="button247_pre"> 
+	private: 
+		std::string type; 
+		std::string file; 
+		std::string nameSpace; 
+		 
+	public : 
+		std::string getType(); 
+		void setType(std::string tp); 
+		std::string getFile(); 
+		void setFile(std::string fi); 
+		std::string getNamespace(); 
+		void setNamespace(std::string nmsp); 
+</pre>	}; 
+	//getter for type 
+	inline std::string CodeAnalysis::TypeInfo::getType() 
+	{<button onclick="myFunction(this)" id="button248">-</button><pre class="showElem" id="button248_pre"> 
+		return type; 
+</pre>	} 
+	//setter for type 
+	 inline void CodeAnalysis::TypeInfo::setType(std::string tp) 
+	{<button onclick="myFunction(this)" id="button249">-</button><pre class="showElem" id="button249_pre"> 
+		 type = tp; 
+</pre>	} 
+	 //getter for file 
+	 inline std::string CodeAnalysis::TypeInfo::getFile() 
+	 {<button onclick="myFunction(this)" id="button250">-</button><pre class="showElem" id="button250_pre"> 
+		 return file; 
+</pre>	 } 
+	 //setter for file 
+	 inline void CodeAnalysis::TypeInfo::setFile(std::string fi) 
+	 {<button onclick="myFunction(this)" id="button251">-</button><pre class="showElem" id="button251_pre"> 
+		 file = fi; 
+</pre>	 } 
+	 //getter for namespace 
+	 inline std::string CodeAnalysis::TypeInfo::getNamespace() 
+	 {<button onclick="myFunction(this)" id="button252">-</button><pre class="showElem" id="button252_pre"> 
+		 return nameSpace; 
+</pre>	 } 
+	 //setter for namespace 
+	 inline void CodeAnalysis::TypeInfo::setNamespace(std::string nmsp) 
+	 {<button onclick="myFunction(this)" id="button253">-</button><pre class="showElem" id="button253_pre"> 
+		 nameSpace = nmsp; 
+</pre>	 } 
+	 using Type = std::string; 
+	 using stringMap = std::unordered_map&lt;std::string, std::string&gt;; 
+ 
+	class TypeTable 
+	{<button onclick="myFunction(this)" id="button254">-</button><pre class="showElem" id="button254_pre"> 
+	public: 
+		TypeTable(); 
+		void doTypeAnal(); 
+		void showTypeTable(); 
+		std::vector&lt;std::string&gt; getTypeDefinationFnames(std::string typeName); 
+		std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; getButtonMap(); 
+		 
+ 
+ 
+ 
+	private: 
+		std::unordered_map&lt;std::string, std::unordered_map&lt;std::size_t, std::size_t&gt;&gt; buttonTableMap; 
+		AbstrSynTree& ASTref_; 
+		bool doNotInclFun = false; 
+		std::string parentSetter = "bd"; 
+		void TypeTable::extractGlobalFunctions(ASTNode * globalNode); 
+		bool globFunWchild = false; 
+		bool checkType(ASTNode * pNode); 
+		void storeGlobalFunction(ASTNode * pNode); 
+		void typeAnalysis(ASTNode * pNode); 
+		std::vector&lt;std::string&gt; nonGlobalFunc; 
+		std::unordered_map&lt;Type, std::vector&lt;TypeInfo&gt;&gt; typeTableMap; 
+		std::unordered_map&lt;Type, std::vector&lt;std::string&gt;&gt; globalFuncMap; 
+		std::stack&lt;std::string&gt; nameSpaceStack; 
+		void chekIfGlobalFun(ASTNode * pNode); 
+		void chekIfGlobalFunWithChild(ASTNode * pNode); 
+		void insertIntoButtonMap(ASTNode * pNode); 
+</pre>	}; 
+} 
+ 
+ 
+	 
+ 
+	 
+ 
+	 
+ 
+ 
+ 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

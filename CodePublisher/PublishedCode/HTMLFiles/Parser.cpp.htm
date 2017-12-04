@@ -1,0 +1,181 @@
+<!----------------------------------------------------------------------------
+   Parser.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:55
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>Parser.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="Logger.h.htm">Logger.h</a></li>
+<li><a href="Parser.h.htm">Parser.h</a></li>
+<li><a href="GrammarHelpers.cpp.htm">GrammarHelpers.cpp</a></li>
+<li><a href="itokcollection.h.htm">itokcollection.h</a></li>
+<li><a href="itokcollection.h.htm">itokcollection.h</a></li>
+<li><a href="Utilities.h.htm">Utilities.h</a></li>
+<li><a href="Utilities.h.htm">Utilities.h</a></li>
+<li><a href="FileSystem.h.htm">FileSystem.h</a></li>
+<li><a href="FileSystem.cpp.htm">FileSystem.cpp</a></li>
+<li><a href="ConfigureParser.h.htm">ConfigureParser.h</a></li>
+<li><a href="ActionsAndRules.h.htm">ActionsAndRules.h</a></li>
+<li><a href="AbstrSynTree.h.htm">AbstrSynTree.h</a></li>
+<li><a href="Executive.cpp.htm">Executive.cpp</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+///////////////////////////////////////////////////////////////////// 
+//  Parser.cpp - Analyzes C++ language constructs                  // 
+//  ver 1.5                                                        // 
+//  Language:      Visual C++ 2008, SP1                            // 
+//  Platform:      Dell XPS 8900, Windows 10                       // 
+//  Application:   Prototype for CSE687 Pr1, Sp09, ...             // 
+//  Author:        Jim Fawcett, CST 4-187, Syracuse University     // 
+//                 (315) 443-3948, jfawcett@twcny.rr.com           // 
+///////////////////////////////////////////////////////////////////// 
+ 
+#include &lt;iostream&gt; 
+#include &lt;string&gt; 
+#include "../Utilities/Utilities.h" 
+#include "../Tokenizer/Tokenizer.h" 
+#include "../SemiExp/SemiExp.h" 
+#include "Parser.h" 
+#include "ActionsAndRules.h" 
+#include "ConfigureParser.h" 
+ 
+using namespace CodeAnalysis; 
+using namespace Scanner; 
+using namespace Utilities; 
+using Demo = Logging::StaticLogger&lt;1&gt;; 
+ 
+//----&lt; register parsing rule &gt;-------------------------------- 
+ 
+void Parser::addRule(IRule* pRule) 
+{<button onclick="myFunction(this)" id="button586">-</button><pre class="showElem" id="button586_pre"> 
+  rules.push_back(pRule); 
+</pre>} 
+//----&lt; get next ITokCollection &gt;------------------------------ 
+ 
+bool Parser::next() <button onclick="myFunction(this)" id="button587">-</button><pre class="showElem" id="button587_pre"> 
+{  
+  bool succeeded = pTokColl-&gt;get(); 
+ 
+  if (!succeeded) 
+  { 
+    return false; 
+  } 
+  std::string debug = pTokColl-&gt;show(); 
+  //GrammarHelper::showParseDemo("get SemiExp: ", *pTokColl); 
+ 
+  pTokColl-&gt;trim(); 
+ 
+  return true; 
+</pre>} 
+ 
+//----&lt; parse the SemiExp by applying all rules to it &gt;-------- 
+ 
+bool Parser::parse() 
+{<button onclick="myFunction(this)" id="button588">-</button><pre class="showElem" id="button588_pre"> 
+  for (size_t i = 0; i&lt;rules.size(); ++i) 
+  { 
+    std::string debug = pTokColl-&gt;show(); 
+ 
+    bool doWhat = rules[i]-&gt;doTest(pTokColl); 
+    if (doWhat == IRule::Stop) 
+      break; 
+  } 
+  return true; 
+</pre>} 
+//----&lt; register action with a rule &gt;-------------------------- 
+ 
+void IRule::addAction(IAction *pAction) 
+{<button onclick="myFunction(this)" id="button589">-</button><pre class="showElem" id="button589_pre"> 
+  actions.push_back(pAction); 
+</pre>} 
+//----&lt; invoke all actions associated with a rule &gt;------------ 
+ 
+void IRule::doActions(const ITokCollection* pTokColl) 
+{<button onclick="myFunction(this)" id="button590">-</button><pre class="showElem" id="button590_pre"> 
+  if(actions.size() &gt; 0) 
+    for(size_t i=0; i&lt;actions.size(); ++i) 
+      actions[i]-&gt;doAction(pTokColl); 
+</pre>} 
+ 
+//----&lt; test stub &gt;-------------------------------------------- 
+ 
+#include "../FileSystem/FileSystem.h" 
+ 
+#ifdef TEST_PARSER 
+ 
+#include &lt;queue&gt; 
+#include &lt;string&gt; 
+#define Util StringHelper 
+ 
+int main(int argc, char* argv[]) 
+{<button onclick="myFunction(this)" id="button591">-</button><pre class="showElem" id="button591_pre"> 
+  Util::Title("Testing Parser Class"); 
+  putline(); 
+ 
+  // collecting tokens from files, named on the command line 
+ 
+  if(argc &lt; 2) 
+  { 
+    std::cout  
+      &lt;&lt; "\n  please enter name of file to process on command line\n\n"; 
+    return 1; 
+  } 
+ 
+  for(int i=1; i&lt;argc; ++i) 
+  { 
+    std::string fileSpec = FileSystem::Path::getFullFileSpec(argv[i]); 
+    std::string msg = "Processing file" + fileSpec; 
+    Util::title(msg); 
+    putline(); 
+ 
+    ConfigParseForCodeAnal configure; 
+    Parser* pParser = configure.Build(); 
+    try 
+    { 
+      if(pParser) 
+      { 
+        if(!configure.Attach(argv[i])) 
+        { 
+          std::cout &lt;&lt; "\n  could not open file " &lt;&lt; fileSpec &lt;&lt; std::endl; 
+          continue; 
+        } 
+      } 
+      else 
+      { 
+        std::cout &lt;&lt; "\n\n  Parser not built\n\n"; 
+        return 1; 
+      } 
+      // now that parser is built, use it 
+ 
+      while(pParser-&gt;next()) 
+        pParser-&gt;parse(); 
+      std::cout &lt;&lt; "\n"; 
+ 
+      // show AST 
+      Repository* pRepo = Repository::getInstance(); 
+      ASTNode* pGlobalScope = pRepo-&gt;getGlobalScope(); 
+      TreeWalk(pGlobalScope); 
+    } 
+    catch(std::exception& ex) 
+    { 
+      std::cout &lt;&lt; "\n\n    " &lt;&lt; ex.what() &lt;&lt; "\n\n"; 
+    } 
+  } 
+  std::cout &lt;&lt; "\n"; 
+</pre>} 
+ 
+#endif 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

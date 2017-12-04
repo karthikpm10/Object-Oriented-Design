@@ -1,0 +1,79 @@
+<!----------------------------------------------------------------------------
+   DisplayEx.h.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:45
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>DisplayEx.h</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="DisplayEx.cpp.htm">DisplayEx.cpp</a></li>
+<li><a href="Typtable.h.htm">Typtable.h</a></li>
+<li><a href="DependencyAnalysis.h.htm">DependencyAnalysis.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#pragma once 
+/////////////////////////////////////////////////////////////////////////////////////// 
+// DisplayEx.h - Displays the type table, dependency table and SCC                   // 
+//                                                                                    // 
+// Karthik Palepally Muniyappa,CSE687 - Object Oriented Design, Spring 2017          //  
+//                                                                                  // 
+//////////////////////////////////////////////////////////////////////////////////// 
+/* 
+Module Operations: 
+================== 
+This module defines a Disp Class 
+Disp class provides functions to: 
+show the type table 
+show the dependency table 
+show Strongly connected Components 
+ 
+Public Interface: 
+================= 
+void showTypeTable(TypeTable &objtypeTable); 
+void showDepTable(DependencyTable &objDepTable); 
+void showStronglyCC(StronglyCC &objSCC); 
+Disp(); 
+* Required Files: 
+* --------------- 
+*   - Typtable.h 
+*   - DependencyAnalysis.h 
+*    -StrongComp.h 
+* Build Process: 
+* -------------- 
+*   devenv DisplayEx.sln /debug rebuild 
+* 
+* Maintenance History: 
+* -------------------- 
+ver 0.1 : 7nd March 2017 
+* 
+/* 
+* - 
+*/ 
+#include"../TypeTable/Typtable.h" 
+#include "../DependencyAnalyzer/DependencyAnalysis.h" 
+ 
+namespace CodeAnalysis 
+{ 
+	class Disp 
+	{<button onclick="myFunction(this)" id="button58">-</button><pre class="showElem" id="button58_pre"> 
+	public: 
+		void showTypeTable(TypeTable &objtypeTable); 
+		void showDepTable(DependencyTable &objDepTable); 
+		//void showStronglyCC(StronglyCC &objSCC); 
+		Disp(); 
+		 
+</pre>	}; 
+} 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

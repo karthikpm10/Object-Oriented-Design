@@ -1,0 +1,452 @@
+<!----------------------------------------------------------------------------
+   DBWrapper.h.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:44
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>DBWrapper.h</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="DBWrapper.cpp.htm">DBWrapper.cpp</a></li>
+<li><a href="NoSqlDb.h.htm">NoSqlDb.h</a></li>
+<li><a href="ScopeStack.cpp.htm">ScopeStack.cpp</a></li>
+<li><a href="GrammarHelpers.cpp.htm">GrammarHelpers.cpp</a></li>
+<li><a href="Convert.h.htm">Convert.h</a></li>
+<li><a href="Executive.cpp.htm">Executive.cpp</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#pragma once 
+////////////////////////////////////////////////////////////////////////////// 
+// DBWrapper.h - key/value pair in-memory database                          // 
+//                                                                          // 
+// Karthik Palepally Muniyappa,CSE687 - Object Oriented Design, Spring 2017 //  
+//                                                                          // 
+////////////////////////////////////////////////////////////////////////////// 
+/* 
+Module Operations: 
+================== 
+This module defines an DBWrapper Class 
+DBWrapper class defines functions to: 
+store an element in the memory map 
+delete an element in the memory map 
+update an element for an existing key 
+show the element of a key 
+show the contents of the unordered map 
+persist the contents of the db to an xml file 
+load the db from the xml file 
+query the db based on various parameters 
+Public Interface: 
+================= 
+using Key = std::string; 
+using Keys = std::vector&lt;Key&gt;; 
+bool insertElement(string key, string typeName, string category, string desc, vector&lt;string&gt; children, Data dataValue);//insert an element into the db 
+bool removeElement(string key);//remove an element from the db 
+void showDB();// show the contents of the db 
+bool updateElement(string key, string paramName, string paramValue,bool add=true);// update the db element 
+bool updateElement(string key, Data paramValue);//update the element 
+Element&lt;Data&gt; getRecord(vector&lt;string&gt; Keys, string key);//get the element of a specified key 
+vector&lt;string&gt; getDBKeys();//get all the db keys 
+vector&lt;string&gt; getChildren(vector&lt;string&gt; Keys, string key);// get the children of a specified key 
+vector&lt;string&gt; query(vector&lt;string&gt; Keys, string regEX, string paramName="default");// query the db and return the keys 
+vector&lt;string&gt; unionKeys(vector&lt;string&gt; keys1, vector&lt;string&gt; keys2);//return the union of two key set 
+vector&lt;string&gt; queryTimeInterval(vector&lt;string&gt; Keys, string startTime, string endTime = "default");// query based on time and date the element was return in the db 
+bool LoadDBfromXmlStr(std::string xmlFpath);//load the db from the xml file 
+DBWrapper(string xmlFPath,int persistCounter=20)//constructor which accepts the xml file path and the counter after which the db contents will be persisted 
+* Required Files: 
+* --------------- 
+*   - NoSqlDb.h 
+*   - Convert.h 
+* Build Process: 
+* -------------- 
+*   devenv DBWrapper.sln /debug rebuild 
+* 
+* Maintenance History: 
+* -------------------- 
+ver 0.1 : 2nd Feb 2017 
+* 
+/* 
+* - 
+*/ 
+#include "../NoSqlDb/NoSqlDb.h" 
+#include&lt;algorithm&gt; 
+#include&lt;regex&gt; 
+#include &lt;time.h&gt; 
+using namespace std; 
+template&lt;typename Data&gt; 
+class DBWrapper 
+{<button onclick="myFunction(this)" id="button40">-</button><pre class="showElem" id="button40_pre"> 
+private: 
+	NoSqlDb&lt;Data&gt; db; 
+	Element&lt;Data&gt; updateChild(Element&lt;Data&gt; element, string child, bool add); 
+public: 
+	bool insertElement(string key, string typeName, string category, string desc, vector&lt;string&gt; children, Data dataValue); 
+	bool removeElement(string key); 
+	void showDB(); 
+	bool updateElement(string key, string paramName, string paramValue, bool add = true); 
+	bool updateElement(string key, Data paramValue); 
+	Element&lt;Data&gt; getRecord(vector&lt;string&gt; Keys, string key); 
+	vector&lt;string&gt; getDBKeys(); 
+	vector&lt;string&gt; getChildren(vector&lt;string&gt; Keys, string key); 
+	vector&lt;string&gt; query(vector&lt;string&gt; Keys, string regEX, string paramName = "default"); 
+	vector&lt;string&gt; unionKeys(vector&lt;string&gt; keys1, vector&lt;string&gt; keys2); 
+	vector&lt;string&gt; queryTimeInterval(vector&lt;string&gt; Keys, string startTime, string endTime = "default"); 
+	bool LoadDBfromXmlStr(std::string xmlFpath); 
+	bool writeDBToFile(std::string xmlFpath); 
+	void setPersistCountXMlPath(string xmlFPath, int persistCounter = 20); 
+	//accepts xmlpath of the file where the contents of the db will be wriiten and read, and a persistence counter, 
+	//after reaching the limit, the contents wiwll be written to file 
+	/*DBWrapper(string xmlFPath, int persistCounter = 20) 
+	{ 
+		db.setxmlFilePath(xmlFPath); 
+		//cout &lt;&lt; "\n*************************Requirement 6: Setting the Number of writes after which the db contents are persisted on line 33 of DBWrapper.h******************************\n"; 
+		db.setPersistCounter(persistCounter); 
+	}*/ 
+	DBWrapper() 
+	{<button onclick="myFunction(this)" id="button41">-</button><pre class="showElem" id="button41_pre"> 
+		std::cout &lt;&lt; "\n***********************BONUS Requirement:Using DB cretaed by me from Project 1***************\n"; 
+</pre>	} 
+ 
+</pre>}; 
+//updates the child vector of the elements 
+template&lt;typename Data&gt; 
+Element&lt;Data&gt; DBWrapper&lt;Data&gt;::updateChild(Element&lt;Data&gt; element, string child, bool add) 
+{<button onclick="myFunction(this)" id="button42">-</button><pre class="showElem" id="button42_pre"> 
+	vector&lt;string&gt; childrens = element.children; 
+	if (add) 
+	{ 
+		childrens.push_back(child); 
+	} 
+	else 
+	{ 
+		childrens.erase(remove(childrens.begin(), childrens.end(), child), childrens.end()); 
+	} 
+	element.children = childrens; 
+	return element; 
+</pre>} 
+//inserts the element into the db 
+template&lt;typename Data&gt; 
+bool DBWrapper&lt;Data&gt;::insertElement(string key, string typeName, string category, string desc, vector&lt;string&gt; children, Data dataValue) 
+{<button onclick="myFunction(this)" id="button43">-</button><pre class="showElem" id="button43_pre"> 
+	bool flag = false; 
+	try 
+	{ 
+		time_t currentTime; 
+		Element&lt;Data&gt; element; 
+		element.name = typeName; 
+		element.category = category; 
+		element.description = desc; 
+		element.children = children; 
+		element.data = dataValue; 
+		element.timeDate = time(&currentTime); 
+		//cout &lt;&lt; "\n**********************Requirement 3: addition of key/value pairs********************************\n"; 
+		flag = db.save(key, element); 
+		//cout &lt;&lt; "\nkey=" &lt;&lt; key &lt;&lt; " saved in DB\n"; 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return flag; 
+</pre>} 
+//deletes the key from the db 
+template&lt;typename Data&gt; 
+bool DBWrapper&lt;Data&gt;::removeElement(string key_delete) 
+{<button onclick="myFunction(this)" id="button44">-</button><pre class="showElem" id="button44_pre"> 
+	bool flag = false; 
+	try 
+	{ 
+		flag = db.removeElement(key_delete); 
+		vector&lt;string&gt; keys = db.keys(); 
+		for (string key : keys) 
+		{ 
+			Element&lt;Data&gt; element = db.value(key); 
+			vector&lt;string&gt; childrens = element.children; 
+			vector&lt;string&gt; tempChildrens = childrens; 
+			//iterating over children, to update the children vector of other elements 
+			for (string child : childrens) 
+			{ 
+				if (child == key_delete) 
+				{ 
+					tempChildrens.erase(remove(tempChildrens.begin(), tempChildrens.end(), key_delete), tempChildrens.end()); 
+				} 
+			} 
+			element.children = tempChildrens; 
+			db.updateElement(key, element); 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return flag; 
+</pre>} 
+//displays the contents of the db 
+template&lt;typename Data&gt; 
+void DBWrapper&lt;Data&gt;::showDB() 
+{<button onclick="myFunction(this)" id="button45">-</button><pre class="showElem" id="button45_pre"> 
+	try 
+	{ 
+		std::cout &lt;&lt; "\n  Retrieving elements from NoSqlDb"; 
+		std::cout &lt;&lt; "\n ------------------------------------------\n"; 
+		std::cout &lt;&lt; "\n  size of db = " &lt;&lt; db.count() &lt;&lt; "\n"; 
+		vector&lt;string&gt; keys = db.keys(); 
+		for (string key : keys) 
+		{ 
+			cout &lt;&lt; "\n  " &lt;&lt; key &lt;&lt; ":"; 
+			cout &lt;&lt; db.value(key).show(); 
+		} 
+		std::cout &lt;&lt; "\n\n"; 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+</pre>} 
+//updates the element based on the paramName 
+template&lt;typename Data&gt; 
+bool DBWrapper&lt;Data&gt;::updateElement(string key, string paramName, string paramValue, bool add) 
+{<button onclick="myFunction(this)" id="button46">-</button><pre class="showElem" id="button46_pre"> 
+	try 
+	{ 
+		bool updateDB = true; 
+		Element&lt;Data&gt; element = db.value(key); 
+		if (string(element.name) != "") 
+		{ 
+			if (paramName == "name") 
+				element.name = paramValue; 
+			else if (paramName == "category") 
+				element.category = paramValue; 
+			else if (paramName == "description") 
+				element.description = paramValue; 
+			else if (paramName == "children") 
+				element = updateChild(element, paramValue, add); 
+			// else if (paramName == "parent") 
+				 //element.parent = paramValue; 
+			else 
+			{ 
+				cout &lt;&lt; "Invalid Param Name"; 
+				updateDB = false; 
+				return false; 
+			} 
+			if (updateDB) 
+			{ 
+				db.updateElement(key, element); 
+				return true; 
+			} 
+		} 
+		return false; 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+		return false; 
+	} 
+</pre>} 
+//updates the data value of the element 
+template&lt;typename Data&gt; 
+bool DBWrapper&lt;Data&gt;::updateElement(string key, Data paramValue) 
+{<button onclick="myFunction(this)" id="button47">-</button><pre class="showElem" id="button47_pre"> 
+	bool flag = false; 
+	try 
+	{ 
+		Element&lt;Data&gt; element = db.value(key); 
+		if (string(element.name) != "") 
+		{ 
+			element.data = paramValue; 
+			flag = db.updateElement(key, element); 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return flag; 
+</pre>} 
+//gets the element of the key  
+template&lt;typename Data&gt; 
+Element&lt;Data&gt; DBWrapper&lt;Data&gt;::getRecord(vector&lt;string&gt; Keys, string key) 
+{<button onclick="myFunction(this)" id="button48">-</button><pre class="showElem" id="button48_pre"> 
+	Element&lt;Data&gt; record; 
+	try 
+	{ 
+		for (string DBKey : Keys) 
+		{ 
+			if (DBKey == key) 
+			{ 
+				record = db.value(key); 
+			} 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return record; 
+</pre>} 
+//returnss the db keys 
+template&lt;typename Data&gt; 
+vector&lt;string&gt; DBWrapper&lt;Data&gt;::getDBKeys() 
+{<button onclick="myFunction(this)" id="button49">-</button><pre class="showElem" id="button49_pre"> 
+	return db.keys(); 
+</pre>} 
+//returns the children of the key 
+template&lt;typename Data&gt; 
+vector&lt;string&gt; DBWrapper&lt;Data&gt;::getChildren(vector&lt;string&gt; Keys, string key) 
+{<button onclick="myFunction(this)" id="button50">-</button><pre class="showElem" id="button50_pre"> 
+	vector&lt;string&gt; children; 
+	try 
+	{ 
+		regex regexp(key); 
+		for (string DBKey : Keys) 
+		{ 
+			if (regex_match(DBKey, regexp)) 
+			{ 
+				children = db.value(key).children; 
+			} 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return children; 
+</pre>} 
+//queries the element parameters based on the regular expression given  
+template&lt;typename Data&gt; 
+vector&lt;string&gt; DBWrapper&lt;Data&gt;::query(vector&lt;string&gt; Keys, string regEX, string paramName) 
+{<button onclick="myFunction(this)" id="button51">-</button><pre class="showElem" id="button51_pre"> 
+	//cout &lt;&lt; "*************************Requirement 12: Queries Implemented using Reg ex  line 316 of DBWrapper.h*******************************"; 
+	vector&lt;string&gt; matchedKeys; 
+	try 
+	{ 
+		regex regexp(regEX); 
+		string searchParam; 
+		for (string DBKey : Keys) 
+		{ 
+			if (paramName == "ItemName") 
+				searchParam = db.value(DBKey).name; 
+			else if (paramName == "category") 
+				searchParam = db.value(DBKey).category; 
+			else if (paramName == "description") 
+				searchParam = db.value(DBKey).description; 
+			else if (paramName == "data") 
+				searchParam = Convert&lt;Data&gt;::toString(db.value(DBKey).data); 
+			else 
+			{ 
+				if (paramName == "default") 
+				{ 
+					if (regex_match(DBKey, regexp)) 
+					{ 
+						matchedKeys.push_back(DBKey); 
+					} 
+				} 
+			} 
+			if (regex_match(searchParam, regexp)) 
+				matchedKeys.push_back(DBKey); 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return matchedKeys; 
+</pre>} 
+// returns the union of two key vectors 
+template&lt;typename Data&gt; 
+vector&lt;string&gt; DBWrapper&lt;Data&gt;::unionKeys(vector&lt;string&gt; keys1, vector&lt;string&gt; keys2) 
+{<button onclick="myFunction(this)" id="button52">-</button><pre class="showElem" id="button52_pre"> 
+	try 
+	{ 
+		for (string key1 : keys1) 
+		{ 
+			bool contains = false; 
+			for (string key2 : keys2) 
+			{ 
+				if (key1 == key2) 
+					contains = true; 
+			} 
+			if (!contains) 
+				keys2.push_back(key1); 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return keys2; 
+</pre>} 
+//queries based on time date of element 
+template&lt;typename Data&gt; 
+vector&lt;string&gt; DBWrapper&lt;Data&gt;::queryTimeInterval(vector&lt;string&gt; Keys, string startTime, string endTime) 
+{<button onclick="myFunction(this)" id="button53">-</button><pre class="showElem" id="button53_pre"> 
+	vector&lt;string&gt; returnKeys; 
+	try 
+	{ 
+		time_t currentTime; 
+		time_t startTimeobj = db.DateTimeFromString(startTime.c_str()); 
+		time_t endTimeobj = (endTime != "default" ? db.DateTimeFromString(endTime.c_str()) : time(&currentTime)); 
+		for (string DBKey : Keys) 
+		{ 
+			time_t elemTime = db.value(DBKey).timeDate; 
+			if ((elemTime &gt; startTimeobj) && (elemTime &lt;= endTimeobj)) 
+			{ 
+				returnKeys.push_back(DBKey); 
+			} 
+		} 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return returnKeys; 
+</pre>} 
+//persists db from xml file 
+template&lt;typename Data&gt; 
+bool DBWrapper&lt;Data&gt;::LoadDBfromXmlStr(std::string xmlFpath) 
+{<button onclick="myFunction(this)" id="button54">-</button><pre class="showElem" id="button54_pre"> 
+	try 
+	{ 
+		db.DBfromXmlStr(xmlFpath); 
+		return true; 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return false; 
+</pre>} 
+//writes the contents of db to a file 
+template&lt;typename Data&gt; 
+bool DBWrapper&lt;Data&gt;::writeDBToFile(std::string xmlFpath) 
+{<button onclick="myFunction(this)" id="button55">-</button><pre class="showElem" id="button55_pre"> 
+	try 
+	{ 
+		db.DBtoXmlStr(xmlFpath); 
+		return true; 
+	} 
+	catch (std::exception& ex) 
+	{ 
+		std::cout &lt;&lt; "Exception " &lt;&lt; ex.what(); 
+	} 
+	return false; 
+</pre>} 
+ 
+template&lt;typename Data&gt; 
+void DBWrapper&lt;Data&gt;::setPersistCountXMlPath(string xmlFPath, int persistCounter) 
+{<button onclick="myFunction(this)" id="button56">-</button><pre class="showElem" id="button56_pre"> 
+	db.setxmlFilePath(xmlFPath); 
+	//cout &lt;&lt; "\n*************************Requirement 6: Setting the Number of writes after which the db contents are persisted on line 33 of DBWrapper.h******************************\n"; 
+	db.setPersistCounter(persistCounter); 
+</pre>} 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

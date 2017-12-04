@@ -1,0 +1,81 @@
+<!----------------------------------------------------------------------------
+   DisplayEx.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:52
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>DisplayEx.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="DisplayEx.h.htm">DisplayEx.h</a></li>
+<li><a href="Typtable.h.htm">Typtable.h</a></li>
+<li><a href="DependencyAnalysis.h.htm">DependencyAnalysis.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#include "DisplayEx.h" 
+using namespace CodeAnalysis; 
+ 
+// displays the type table 
+void CodeAnalysis::Disp::showTypeTable(TypeTable & objtypeTable) 
+{<button onclick="myFunction(this)" id="button418">-</button><pre class="showElem" id="button418_pre"> 
+	std::cout &lt;&lt; "\n***************************************************************************************************************\n"; 
+	std::cout &lt;&lt; "\n********************Showing Type Table From DisplayEX package********************\n"; 
+	std::cout &lt;&lt; "\n*****************************TypeTable******************************\n"; 
+	objtypeTable.showTypeTable(); 
+	std::cout &lt;&lt; "\n***************************************************************************************************************\n"; 
+</pre>} 
+// displays the Dependency table table 
+void CodeAnalysis::Disp::showDepTable(DependencyTable & objDepTable) 
+{<button onclick="myFunction(this)" id="button419">-</button><pre class="showElem" id="button419_pre"> 
+	std::cout &lt;&lt; "\n***************************************************************************************************************\n"; 
+	std::cout &lt;&lt; "\n********************Showing Dependency Table From DisplayEX package********************\n"; 
+	std::cout &lt;&lt; "\n*****************************Dependency Table******************************\n"; 
+	objDepTable.showDepTable(); 
+	std::cout &lt;&lt; "\n***************************************************************************************************************\n"; 
+</pre>} 
+// displays SCC 
+/*void CodeAnalysis::Disp::showStronglyCC(StronglyCC & objSCC) 
+{ 
+	std::cout &lt;&lt; "\n***************************************************************************************************************\n"; 
+	std::cout &lt;&lt; "\n********************Showing Strongly Connected Components From DisplayEX package********************\n"; 
+	std::cout &lt;&lt; "\n*****************************Strongly Connected Components******************************\n"; 
+	objSCC.showSCC(); 
+	std::cout &lt;&lt; "\n***************************************************************************************************************\n"; 
+}*/ 
+//constructor 
+CodeAnalysis::Disp::Disp() 
+{<button onclick="myFunction(this)" id="button420">-</button><pre class="showElem" id="button420_pre"> 
+	//std::cout &lt;&lt; "\n**************************** Requirement  3: Display Package : Object created**************************************************\n"; 
+</pre>} 
+ 
+ 
+#ifdef DISPLAY 
+int main() 
+{<button onclick="myFunction(this)" id="button421">-</button><pre class="showElem" id="button421_pre"> 
+	Disp objDisp; 
+	TypeTable objttb; 
+	objttb.doTypeAnal(); 
+	DependencyTable objDepTable("../../xml1"); 
+	objDepTable.buildDependencyTable(fileNames, objttb); 
+	 
+ 
+	objDisp.showTypeTable(objttb); 
+	objDisp.showDepTable(objDepTable); 
+	 
+	 
+ 
+	return 0; 
+</pre>} 
+#endif // DISPLAY 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

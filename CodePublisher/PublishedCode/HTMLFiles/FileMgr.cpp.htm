@@ -1,0 +1,98 @@
+<!----------------------------------------------------------------------------
+   FileMgr.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:52
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>FileMgr.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="IFileMgr.h.htm">IFileMgr.h</a></li>
+<li><a href="FileMgr.h.htm">FileMgr.h</a></li>
+<li><a href="FileSystem.h.htm">FileSystem.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+///////////////////////////////////////////////////////////////////// 
+// FileMgr.cpp - find files matching specified patterns            // 
+//               on a specified path                               // 
+// ver 2.2                                                         // 
+// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2016       // 
+///////////////////////////////////////////////////////////////////// 
+ 
+#include "FileMgr.h" 
+#include &lt;iostream&gt; 
+ 
+using namespace FileManager; 
+ 
+IFileMgr* FileMgr::pInstance_; 
+ 
+IFileMgr* IFileMgr::getInstance() 
+{<button onclick="myFunction(this)" id="button422">-</button><pre class="showElem" id="button422_pre"> 
+  return FileMgr::getInstance(); 
+</pre>} 
+ 
+#ifdef TEST_FILEMGR 
+ 
+using namespace FileManager; 
+ 
+struct FileHandler : IFileEventHandler 
+{ 
+  void execute(const std::string& fileSpec) 
+  {<button onclick="myFunction(this)" id="button423">-</button><pre class="showElem" id="button423_pre"> 
+    std::cout &lt;&lt; "\n  --   " &lt;&lt; fileSpec; 
+</pre>  } 
+}; 
+ 
+struct DirHandler : IDirEventHandler 
+{ 
+  void execute(const std::string& dirSpec) 
+  {<button onclick="myFunction(this)" id="button424">-</button><pre class="showElem" id="button424_pre"> 
+    std::cout &lt;&lt; "\n  ++ " &lt;&lt; dirSpec; 
+</pre>  } 
+}; 
+ 
+struct DoneHandler : IDoneEventHandler 
+{ 
+  void execute(size_t numFilesProcessed) 
+  {<button onclick="myFunction(this)" id="button425">-</button><pre class="showElem" id="button425_pre"> 
+    std::cout &lt;&lt; "\n\n  Processed " &lt;&lt; numFilesProcessed &lt;&lt; " files"; 
+</pre>  } 
+}; 
+int main() 
+{<button onclick="myFunction(this)" id="button426">-</button><pre class="showElem" id="button426_pre"> 
+  std::cout &lt;&lt; "\n  Testing FileMgr"; 
+  std::cout &lt;&lt; "\n ================="; 
+ 
+  std::string path = FileSystem::Path::getFullFileSpec(".."); 
+  IFileMgr* pFmgr = FileMgrFactory::create(path); 
+ 
+  FileHandler fh; 
+  DirHandler dh; 
+  DoneHandler dnh; 
+ 
+  pFmgr-&gt;regForFiles(&fh); 
+  pFmgr-&gt;regForDirs(&dh); 
+  pFmgr-&gt;regForDone(&dnh); 
+ 
+  pFmgr-&gt;addPattern("*.h"); 
+  pFmgr-&gt;addPattern("*.cpp"); 
+  //pFmgr-&gt;addPattern("*.log"); 
+ 
+  pFmgr-&gt;search(); 
+ 
+  std::cout &lt;&lt; "\n\n"; 
+  return 0; 
+</pre>} 
+#endif 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!----------------------------------------------------------------------------
+   DBWrapper.cpp.htm  -Published HTML File
+   Published on : 2017-04-04.21:42:52
+   Author:Karthik Palepally Muniyappa  
+----------------------------------------------------------------------------->
+<html>
+<head>
+<link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+<h3>DBWrapper.cpp</h3>
+<hr />
+<div class="indent">
+<h4>Dependencies:</h4>
+<ul>
+<li><a href="DBWrapper.h.htm">DBWrapper.h</a></li>
+</ul>
+</div>
+<hr />
+<pre>
+#include "DBWrapper.h" 
+#include &lt;iostream&gt; 
+using namespace std; 
+ 
+#ifdef DEBUGDBWRAPPER 
+int main() 
+{<button onclick="myFunction(this)" id="button408">-</button><pre class="showElem" id="button408_pre"> 
+	vector&lt;string&gt; childrenvector; 
+	childrenvector.push_back("key2"); 
+	childrenvector.push_back("bcsjbb"); 
+	DBWrapper&lt;string&gt; obj; 
+	obj.setPersistCountXMlPath("../XMLInputFiles/xml1.xml", 20); 
+	obj.LoadDBfromXmlStr("../XMLInputFiles/xml1.xml"); 
+	obj.insertElement("key1", "string", "cat1", "demo", childrenvector, "data1 bedhbeuj"); 
+	childrenvector.pop_back(); 
+	childrenvector.push_back("keydummy"); 
+	obj.insertElement("key2", "string", "cat1", "demo", childrenvector, "data1"); 
+	obj.insertElement("key3", "string", "cat1", "demo", childrenvector, "data1"); 
+	obj.insertElement("key4", "string", "cat1", "demo", childrenvector, "data1"); 
+	obj.showDB(); 
+	obj.updateElement("key4", "children", "keydummy", false); 
+	obj.showDB(); 
+	obj.updateElement("key4", "data2"); 
+	obj.showDB(); 
+	obj.removeElement("key2"); 
+	std::cout &lt;&lt; "\n  Retrieving elements after delete NoSqlDb&lt;string&gt;"; 
+	obj.showDB(); 
+	obj.query(obj.getDBKeys(), ".*ke.*"); 
+	obj.queryTimeInterval(obj.getDBKeys(), "2017-02-07_00:17:06"); 
+	// 
+</pre>} 
+#endif 
+</pre>
+<script src="../JS/hideHandler.js"></script>
+</body>
+</html>
