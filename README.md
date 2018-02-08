@@ -30,7 +30,7 @@ The channel supports:
 
 HTTP style request/response transactions
 One-way communication, allowing asynchronous messaging between any two endpoints that are capable of listening for connection requests and connecting to a remote listener.
-Transmission of byte streams that are set up with one or more negotiation messages followed by transmission of a stream of bytes of specified stream size2.
+Transmission of byte streams that are set up with one or more negotiation messages followed by transmission of a stream of bytes of specified stream size.
 
 
 The Remote Code Publisher :
@@ -38,13 +38,13 @@ The Remote Code Publisher :
 Support publishing web pages that are small wrappers around C++ source code files.
 Accept source code text files, sent from a local client.
 Support building dependency relationships between code files saved in specific repository folders.
-Support HTML file creation for all the files in a specified repository folder1, including linking information that displays dependency relationships, and supports and navigation based on dependency relationships.
+Support HTML file creation for all the files in a specified repository folder, including linking information that displays dependency relationships, and supports and navigation based on dependency relationships.
 Delete stored files, as requested by a local client.
 
 
 Clients of the Remote Code Publisher provides a Graphical User Interface (GUI) with means to:
 
-Upload one or more source code text files to the Remote Publisher, specifying a category with which those files are associated1.
+Upload one or more source code text files to the Remote Publisher, specifying a category with which those files are associated.
 Display file categories, based on the directory structure supported by the Repository.
 Display all the files in any category.
 Display all of the files in any category that have no parents.
